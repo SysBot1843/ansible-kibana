@@ -78,6 +78,21 @@
   when: server_ssl_key and server_ssl_cert
   notify: restart kibana
   register: copy_server_certificates
+  
+- name: Upload Elasticsearch Server certificate authority
+  become: yes
+  copy:
+    src: "{{ item }}"
+    dest: "{{ es_ssl_certificate_path }}/{{ item | basename }}"
+    owner: "{{ kibana_user }}"
+    group: "{{ kibana_group }}"
+    mode: "640"
+  with_items:
+    - "{{ es_ssl_certificateauthorities }}"
+  when: es_ssl_certificateauthorities
+  notify: restart kibana
+  register: copy_es_server_certificate_authority
+   
 ###
 #Create KeyStore
 - name: Check that Kibana keystore exists
